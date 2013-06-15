@@ -253,10 +253,7 @@ void SENTENCE::Finish( void )
 
    unsigned char checksum = ComputeChecksum();
 
-   wxString temp_string;
-
-   temp_string.Printf(_T("*%02X%c%c"), (int) checksum, CARRIAGE_RETURN, LINE_FEED );
-   Sentence += temp_string;
+   Sentence += wxString::Format(_T("*%02X%c%c"), (int) checksum, CARRIAGE_RETURN, LINE_FEED );
 }
 
 int SENTENCE::Integer( int field_number ) const
@@ -464,12 +461,7 @@ const SENTENCE& SENTENCE::operator += ( double value )
 {
 //   ASSERT_VALID( this );
 
-   wxString temp_string;
-
-   temp_string.Printf(_T("%.3f"), value );
-
-   Sentence += _T(",");
-   Sentence += temp_string;
+   Sentence += wxString::Format(_T(",%.3f"), value );
 
    return( *this );
 }
@@ -614,30 +606,25 @@ const SENTENCE& SENTENCE::operator += ( NORTHSOUTH northing )
 
     Sentence += _T(",");
 
-   if ( northing == North )
-   {
-       Sentence += _T("N");
-   }
-   else if ( northing == South )
-   {
-       Sentence += _T("S");
-   }
+    if ( northing == North )
+    {
+        Sentence += _T("N");
+    }
+    else if ( northing == South )
+    {
+        Sentence += _T("S");
+    }
 
-   return( *this );
+    return( *this );
 }
 
 const SENTENCE& SENTENCE::operator += ( int value )
 {
 //   ASSERT_VALID( this );
 
-   wxString temp_string;
+    Sentence += wxString::Format(_T(",%d"), value );
 
-   temp_string.Printf(_T("%d"), value );
-
-   Sentence += _T(",");
-   Sentence += temp_string;
-
-   return( *this );
+    return( *this );
 }
 
 const SENTENCE& SENTENCE::operator += ( EASTWEST easting )
@@ -646,16 +633,16 @@ const SENTENCE& SENTENCE::operator += ( EASTWEST easting )
 
     Sentence += _T(",");
 
-   if ( easting == East )
-   {
-       Sentence += _T("E");
-   }
-   else if ( easting == West )
-   {
-       Sentence += _T("W");
-   }
+    if ( easting == East )
+    {
+        Sentence += _T("E");
+    }
+    else if ( easting == West )
+    {
+        Sentence += _T("W");
+    }
 
-   return( *this );
+    return( *this );
 }
 
 const SENTENCE& SENTENCE::operator += ( NMEA0183_BOOLEAN boolean )
@@ -664,16 +651,16 @@ const SENTENCE& SENTENCE::operator += ( NMEA0183_BOOLEAN boolean )
 
     Sentence += _T(",");
 
-   if ( boolean == NTrue )
-   {
-       Sentence += _T("A");
-   }
-   else if ( boolean == NFalse )
-   {
-       Sentence += _T("V");
-   }
+    if ( boolean == NTrue )
+    {
+        Sentence += _T("A");
+    }
+    else if ( boolean == NFalse )
+    {
+        Sentence += _T("V");
+    }
 
-   return( *this );
+    return( *this );
 }
 
 const SENTENCE& SENTENCE::operator += ( LATLONG& source )
