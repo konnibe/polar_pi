@@ -338,19 +338,22 @@ void polar_pi::OnToolbarToolCallback(int id)
       m_bShowPolar = !m_bShowPolar;
 
       // show the Polar dialog
-      if(NULL == m_pPolarDialog)
-      {
-            m_pPolarDialog = new PolarDialog(m_parent_window, this);
-				if(opt->sailsName.Count() == 0)
-	{
-		m_pPolarDialog->m_buttonFilterPolar->Hide();
-		m_pPolarDialog->m_button61->Hide();
-		m_pPolarDialog->m_staticline421->Hide();
-		m_pPolarDialog->m_choiceMode->SetSelection(1); // to NMEA
-		m_pPolarDialog->polar->setMode(1); // to NMEA
+	  if(NULL == m_pPolarDialog)
+	  {
+		  m_pPolarDialog = new PolarDialog(m_parent_window, this);
+		  if(opt->sailsName.Count() == 0)
+		  {
+			  m_pPolarDialog->m_buttonFilterPolar->Hide();
+			  m_pPolarDialog->m_button61->Hide();
+			  m_pPolarDialog->m_staticline421->Hide();
+			  m_pPolarDialog->m_choiceMode->SetSelection(1); // to NMEA
+			  m_pPolarDialog->polar->setMode(1); // to NMEA
 
-	}
-            m_pPolarDialog->Hide();                        // Show modeless, so it stays on the screen
+		  }
+		  else
+			  m_pPolarDialog->m_splitter1->Unsplit();
+
+            m_pPolarDialog->Hide();                        
       }
 
       //    Toggle dialog?
