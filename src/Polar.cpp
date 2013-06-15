@@ -241,7 +241,8 @@ bool Polar::insert()
 	if(windAngle >=0 && windSpeed >= 0 && (speedoSpeed > 0 || gpsSpeed > 0))
 	{
 		int tdir = windAngle;
-		windAngle = wxRound(atan(windSpeed*sin(windAngle*PI/180)/(windSpeed*cos(windAngle*PI/180)-speed))*180/PI);
+		if(windReference == _T("R"))
+			windAngle = wxRound(atan(windSpeed*sin(windAngle*PI/180)/(windSpeed*cos(windAngle*PI/180)-speed))*180/PI); // make true wind-angle
 		if(windAngle < 0 && tdir <= 180)
 			windAngle += 180;
 		else if(windAngle < 0 && tdir > 180)
@@ -275,6 +276,7 @@ bool Polar::insert()
 			gpsSpeed = 0;
 			windSpeed = -1;
 			windAngle = -1;
+			windReference = wxEmptyString;
 			timeout = 5;
 
 			return true;
@@ -351,7 +353,7 @@ void Polar::Render()
 
 	}
 
-	if(mode == 0)
+	if(mode == 0 && opt->sailsName.Count() != 0)
 	{
 		dc->DrawText(_("Filtered by:"), center.x+rSpeed[(int)knots-1]+100, 60);
 
@@ -1024,7 +1026,6 @@ void Polar::setSentence(wxString sentence)
 			{
 				double dWind = 0;
 				windAngle = m_NMEA0183.Vwr.WindDirectionMagnitude;
-
 				windReference = _T("R");
 
 				//if(m_NMEA0183.Vwr..WindSpeedUnits == 'N')
@@ -1213,6 +1214,8 @@ FilterDlg::~FilterDlg()
 
 void FilterDlg::init()
 {
+	if(opt->abrSails.Count() != 0)
+	{
 	fgSizer50->Clear(true);
 	m_panel33->Layout();
 
@@ -1232,6 +1235,7 @@ void FilterDlg::init()
 	*/
 	fgSizer50->SetVGap(opt->rowGap);
 	fgSizer50->SetHGap(opt->colGap);
+	}
 
 	wxString d;
 	switch(0)
@@ -1298,6 +1302,8 @@ void FilterDlg::init()
 	this->Layout();
 
 	this->m_notebook6->RemovePage(2);
+//	if(opt->abrSails.Count() == 0)
+//		this->m_notebook6->RemovePage(1);
 }
 
 void FilterDlg::OnOKButtonClick( wxCommandEvent& event )

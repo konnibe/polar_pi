@@ -7,10 +7,12 @@
 !define PRODUCT_VERSION "0.4"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+
+
 XPStyle on
 RequestExecutionLevel admin
-
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+
 OutFile "Polar_pi-Setup.exe"
 LoadLanguageFile "${NSISDIR}\Contrib\Language files\Czech.nlf"
 LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
@@ -135,7 +137,7 @@ Function RadioClick
 	${If} $hwnd == $Group1Radio1
 	    StrCpy $INSTDIR "$PROGRAMFILES\OpenCPN"
 	${ElseIf} $hwnd == $Group1Radio2
-	    StrCpy $INSTDIR "$PROGRAMFILES\OpenCPN 3.2.0"
+	    StrCpy $INSTDIR "$PROGRAMFILES\OpenCPN 3.3.604"
 	${EndIf}
 FunctionEnd
 
@@ -144,6 +146,7 @@ Function OnBack
 FunctionEnd
 
 Section "DLL" SEC01
+  LogSet On
   SetOutPath "$INSTDIR\plugins"
   SetOverwrite on
   File "C:\Program Files (x86)\OpenCPN\plugins\polar_pi.dll"
@@ -155,9 +158,9 @@ Section "Languages" SEC02
    */
    SetOutPath "$INSTDIR\share\locale\de\LC_MESSAGES\"
    File "C:\Program Files (x86)\OpenCPN\share\locale\de\LC_MESSAGES\opencpn-polar_pi.mo"
-/*   SetOutPath "$INSTDIR\share\locale\fr\LC_MESSAGES\"
+   SetOutPath "$INSTDIR\share\locale\fr\LC_MESSAGES\"
    File "C:\Program Files (x86)\OpenCPN\share\locale\fr\LC_MESSAGES\opencpn-polar_pi.mo"
-
+/*
    SetOutPath "$INSTDIR\share\locale\es\LC_MESSAGES\"
    File "C:\Program Files (x86)\OpenCPN\share\locale\es\LC_MESSAGES\opencpn-polar_pi.mo"
    SetOutPath "$INSTDIR\share\locale\da\LC_MESSAGES\"
@@ -185,7 +188,7 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Please close OpenCPN now, if it's running for a clean uninstall,$\nbut don't close this window.$\n$\nDo You like to uninstall $(^Name), all of it's components and data?All your logbooks are deleted !!" IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "Please close OpenCPN now, if it's running for a clean uninstall,$\nbut don't close this window." IDYES +2
   Abort
 FunctionEnd
 

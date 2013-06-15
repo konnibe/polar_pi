@@ -1,4 +1,5 @@
 #include "PolarDialog.h"
+#include "polar_pi.h"
 #include "Polar.h"
 
 #include <math.h>  
@@ -74,6 +75,7 @@ void PolarDialog::OnTimer(wxTimerEvent& event)
 	if(polar->timeout == 0)
 	{
 		polar->windAngle = -1;
+		polar->windReference = wxEmptyString;
 		polar->windSpeed = -1;
 		polar->speedoSpeed = -1;
 		polar->gpsSpeed = -1;
@@ -83,7 +85,7 @@ void PolarDialog::OnTimer(wxTimerEvent& event)
 
 void PolarDialog::PolarDialogOnInitDialog( wxInitDialogEvent& event )
 {
-	m_splitter1->Unsplit();
+//	m_splitter1->Unsplit();
 /*	m_gridEdit->GetGridCornerLabelWindow()->SetFocus();
 	m_gridEdit->GetGridCornerLabelWindow()->SetForegroundColour(wxColour(0,0,0));
 	m_gridEdit->GetGridCornerLabelWindow()->SetLabel(wxString((_("TWA/TWS"))));
@@ -158,7 +160,17 @@ void PolarDialog::OnSplitterSashPosChanged( wxSplitterEvent& event )
 
 void PolarDialog::OnChoiceMode( wxCommandEvent& event )
 {
-	polar->setMode(event.GetSelection());
+	static int sel = -1;
+
+	if(event.GetSelection() == 0 && plugin->opt->abrSails.Count() == 0)
+	{
+		wxMessageBox(_("The plugin logbookkonni isn't installed\n\nIt's needed to collect wind/speed-data from all available logbooks\n\nThe create-button is hidden and the mode isn't useable"));
+		m_choiceMode->SetSelection((sel==-1)?sel = 1:sel);
+		return;
+	}
+
+	sel = event.GetSelection();
+	polar->setMode(sel);
 }
 
 void PolarDialog::OnGridCellChange( wxGridEvent& event )

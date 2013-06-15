@@ -341,6 +341,15 @@ void polar_pi::OnToolbarToolCallback(int id)
       if(NULL == m_pPolarDialog)
       {
             m_pPolarDialog = new PolarDialog(m_parent_window, this);
+				if(opt->sailsName.Count() == 0)
+	{
+		m_pPolarDialog->m_buttonFilterPolar->Hide();
+		m_pPolarDialog->m_button61->Hide();
+		m_pPolarDialog->m_staticline421->Hide();
+		m_pPolarDialog->m_choiceMode->SetSelection(1); // to NMEA
+		m_pPolarDialog->polar->setMode(1); // to NMEA
+
+	}
             m_pPolarDialog->Hide();                        // Show modeless, so it stays on the screen
       }
 
@@ -388,7 +397,7 @@ bool polar_pi::LoadConfig(void)
 
       if(pConf)
       {
-            pConf->SetPath ( _T( "/Settings" ) );
+            pConf->SetPath ( _T( "/PlugIns/Polar" ) );
             pConf->Read ( _T( "ShowPolarIcon" ),  &m_bPolarShowIcon, 1 );
             pConf->Read ( _T( "PolarUseMS" ),     &m_bPolarUseMS, 0 );
 
@@ -403,7 +412,7 @@ bool polar_pi::LoadConfig(void)
 //            if((m_Polar_dialog_y < 0) || (m_Polar_dialog_y > m_display_height))
 //                  m_Polar_dialog_y = 5;
 
-            pConf->SetPath ( _T ( "/Directories" ) );
+            //pConf->SetPath ( _T ( "/PlugIns/Polar/Directories" ) );
             pConf->Read ( _T ( "PolarDirectory" ), &m_Polar_dir );
 
 			pConf->SetPath ( _T( "/PlugIns/Logbook" ) );
@@ -437,7 +446,7 @@ bool polar_pi::SaveConfig(void)
 
       if(pConf)
       {
-            pConf->SetPath ( _T ( "/Settings" ) );
+            pConf->SetPath ( _T ( "/Plugins/Polar" ) );
             pConf->Write ( _T ( "ShowPolarIcon" ), m_bPolarShowIcon );
             pConf->Write ( _T ( "PolarUseMS" ),    m_bPolarUseMS );
 
@@ -446,7 +455,7 @@ bool polar_pi::SaveConfig(void)
             pConf->Write ( _T ( "PolarDialogPosX" ),   m_Polar_dialog_x );
             pConf->Write ( _T ( "PolarDialogPosY" ),   m_Polar_dialog_y );
 
-            pConf->SetPath ( _T ( "/Directories" ) );
+           // pConf->SetPath ( _T ( "/Directories" ) );
             pConf->Write ( _T ( "PolarDirectory" ), m_Polar_dir );
 
             return true;
