@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: polar_pi 3.3.604\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-06-15 20:13+0200\n"
+"POT-Creation-Date: 2013-06-16 23:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/PolarGui.h:96
+#: src/PolarGui.h:98
 msgid "Polar Diagram"
 msgstr ""
 
@@ -57,12 +57,12 @@ msgstr ""
 msgid "Calculate speed-bullets for x degrees "
 msgstr ""
 
-#: src/PolarGui.cpp:59 src/Polar.cpp:1251
+#: src/PolarGui.cpp:59 src/Polar.cpp:1364
 msgid "Wind:"
 msgstr ""
 
-#: src/PolarGui.cpp:63 src/PolarGui.cpp:90 src/Polar.cpp:1271
-#: src/Polar.cpp:1284
+#: src/PolarGui.cpp:63 src/PolarGui.cpp:90 src/Polar.cpp:1384
+#: src/Polar.cpp:1397
 msgid "any"
 msgstr ""
 
@@ -104,11 +104,11 @@ msgstr ""
 msgid "Load"
 msgstr ""
 
-#: src/PolarGui.cpp:211
+#: src/PolarGui.cpp:212
 msgid "Clear Data"
 msgstr ""
 
-#: src/PolarGui.cpp:214
+#: src/PolarGui.cpp:215
 msgid "Record Start"
 msgstr ""
 
@@ -158,63 +158,67 @@ msgid ""
 "The create-button is hidden and the mode isn't useable"
 msgstr ""
 
-#: src/Polar.h:183
+#: src/Polar.h:190
 msgid "Polar Filter"
 msgstr ""
 
-#: src/Polar.cpp:177
+#: src/Polar.cpp:63
+msgid "Max. only"
+msgstr ""
+
+#: src/Polar.cpp:184
 msgid "Engine started / Recording is stopped"
 msgstr ""
 
-#: src/Polar.cpp:194
+#: src/Polar.cpp:201
 msgid "Select a VDR-File"
 msgstr ""
 
-#: src/Polar.cpp:207 src/Polar.cpp:387
+#: src/Polar.cpp:214 src/Polar.cpp:394
 msgid "Please wait."
 msgstr ""
 
-#: src/Polar.cpp:304
-msgid "Testing, work in progress..."
-msgstr ""
-
-#: src/Polar.cpp:309
+#: src/Polar.cpp:316
 msgid "less than 3 entries found"
 msgstr ""
 
-#: src/Polar.cpp:312
+#: src/Polar.cpp:319
 msgid "less than 5 entries found"
 msgstr ""
 
-#: src/Polar.cpp:315
+#: src/Polar.cpp:322
 msgid "more than 10 entries found"
 msgstr ""
 
-#: src/Polar.cpp:358
+#: src/Polar.cpp:365
 msgid "Filtered by:"
 msgstr ""
 
-#: src/Polar.cpp:394
+#: src/Polar.cpp:401
 msgid "Collecting: "
 msgstr ""
 
-#: src/Polar.cpp:709
+#: src/Polar.cpp:818
 msgid "Save Polar File"
 msgstr ""
 
-#: src/Polar.cpp:883
+#: src/Polar.cpp:992
 msgid "Select a Polar-File"
 msgstr ""
 
-#: src/Polar.cpp:1109
+#: src/Polar.cpp:1217
+msgid "Use Max-Speed only"
+msgstr ""
+
+#: src/Polar.cpp:1224
 msgid "Use Average from all speed-data"
 msgstr ""
 
-#: src/Polar.cpp:1115
+#: src/Polar.cpp:1230
 msgid "Range from maximum speed to minus"
 msgstr ""
 
-#: src/Polar.cpp:1117
+#: src/Polar.cpp:1231
 msgid ""
 "Example:\n"
 "Max-Speed = 2,5 kts\n"
@@ -222,42 +226,34 @@ msgid ""
 "Range from 2,25 to 2,5 kts"
 msgstr ""
 
-#: src/Polar.cpp:1134
+#: src/Polar.cpp:1248
 msgid "Range"
 msgstr ""
 
-#: src/Polar.cpp:1138
-msgid "Work in progress"
-msgstr ""
-
-#: src/Polar.cpp:1156
+#: src/Polar.cpp:1270
 msgid "Sails"
 msgstr ""
 
-#: src/Polar.cpp:1160
-msgid "Work in progess"
-msgstr ""
-
-#: src/Polar.cpp:1167
+#: src/Polar.cpp:1281
 msgid "MyLabel"
 msgstr ""
 
-#: src/Polar.cpp:1181
+#: src/Polar.cpp:1295
 msgid "Wavehight"
 msgstr ""
 
-#: src/Polar.cpp:1259
+#: src/Polar.cpp:1372
 msgid "kts"
 msgstr ""
 
-#: src/Polar.cpp:1266
+#: src/Polar.cpp:1379
 msgid "Wavehight from"
 msgstr ""
 
-#: src/Polar.cpp:1279
+#: src/Polar.cpp:1392
 msgid "to"
 msgstr ""
 
-#: src/Polar.cpp:1339
+#: src/Polar.cpp:1452
 msgid "Collecting Data from: "
 msgstr ""

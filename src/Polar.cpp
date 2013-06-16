@@ -15,10 +15,9 @@
 #include <wx/progdlg.h>
 #include <wx/gdicmn.h>
 
+#include "nmea0183/nmea0183.h"
 #include "polar_pi.h"
 #include "Polar.h"
-
-#include "nmea0183/nmea0183.h"
 
 #include <map>
 
@@ -60,7 +59,9 @@ Polar::Polar(PolarDialog* parent)
 	for(int i = 4; i < 41; i += 4)
 		dlg->m_choiceWindPolar->Append(wxString::Format(_T("%i knots"),i));
 
-	dlg->m_choiceWindPolar->SetSelection(3);
+
+	dlg->m_choiceWindPolar->Append(_("Max. only"));
+	dlg->m_choiceWindPolar->SetSelection(0);
 
 	dlg->m_panelPolar->Layout();
 	dlg->m_buttonSavePolar->Enable(false);
@@ -133,7 +134,10 @@ void Polar::setMode(int sel)
 	case 1:	
 	case 2:
 		if(!dlg->m_splitter1->IsSplit())
+		{
 			dlg->m_splitter1->SplitVertically(dlg->m_panelPolar,dlg->m_panel6,sash);
+			dlg->m_splitter1->SetSashPosition(400);
+		}
 		dlg->m_buttonSavePolar->Enable();
 		dlg->m_button61->Disable();
 		dlg->m_buttonFilterPolar->Disable();
@@ -152,7 +156,10 @@ void Polar::setMode(int sel)
 		break;
 	case 3:	
 		if(!dlg->m_splitter1->IsSplit())
+		{
 			dlg->m_splitter1->SplitVertically(dlg->m_panelPolar,dlg->m_panel6,sash);
+			dlg->m_splitter1->SetSashPosition(400);
+		}
 		if(dlg->timer->IsRunning())
 			dlg->timer->Stop();
 		dlg->m_buttonSavePolar->Enable();
@@ -301,7 +308,7 @@ void Polar::Render()
 {
 	if(mode == 0)
 	{
-		dc->DrawText(_("Testing, work in progress..."), 40, 60); 
+//		dc->DrawText(_("Testing, work in progress..."), 40, 60); 
 
 		dc->SetPen( wxPen( wxColor(0,0,0), 1 ) ); 
 		dc->SetBrush( wxBrush(wxColour(255,0,0)) );	
@@ -605,6 +612,9 @@ void Polar::createPolar()
 
 void Polar::createSpeedBullets()
 {
+	int sel = dlg->m_choiceWindPolar->GetSelection();
+	if(sel == 11) { createSpeedBulletsMax(); return; }
+
 	int radius = 5;
 	double length = dist;												
 	dc->SetPen( wxPen( wxColor(0,0,0), 1 ) ); 
@@ -613,11 +623,10 @@ void Polar::createSpeedBullets()
 	int xt, yt, pc;
 	wxPoint ptArr[360];
 
-	int sel = dlg->m_choiceWindPolar->GetSelection();
 	if(sel != 0) 
-	{ sel -= 1; end = sel+1; }
+		{ sel -= 1; end = sel+1; }
 	else
-	{ sel = 0; end = 10; }
+		{ sel = 0; end = 10; }
 
 	int linelength;
 	wxColour colour,brush;
@@ -633,11 +642,14 @@ void Polar::createSpeedBullets()
 			if(mode == 0)
 			{
 				if(windsp[wsp].count[dir] < 3)
-					dc->SetBrush( wxBrush(wxColour(255,0,0)) );							// set bulletcolor for logbook-mode
+					//dc->SetBrush( wxBrush(wxColour(255,0,0)) );							// set bulletcolor for logbook-mode
+					brush = wxColour(255,0,0);
 				else if( windsp[wsp].count[dir]  >= 3 && windsp[wsp].count[dir] < 5)
-					dc->SetBrush( wxBrush(wxColour(255,255,0)) );	
+					//dc->SetBrush( wxBrush(wxColour(255,255,0)) );	
+					brush = wxColour(255,255,0);
 				else
-					dc->SetBrush( wxBrush(wxColour(0,255,0)) );
+					brush = wxColour(0,255,0);
+					//dc->SetBrush( wxBrush(wxColour(0,255,0)) );
 			}
 			else
 				dc->SetBrush( brush );
@@ -645,7 +657,10 @@ void Polar::createSpeedBullets()
 			switch(mode)
 			{
 			case 0:
-				linelength = windsp[wsp].wdirTotal[dir]*length;			// calculate distance from centerpoint for speed
+				if(filterDlg->m_checkBoxMax->GetValue())
+					linelength = windsp[wsp].wdirMax[dir]*length;
+				else
+					linelength = windsp[wsp].wdirTotal[dir]*length;			// calculate distance from centerpoint for speed
 				break;
 			case 1:
 			case 2:
@@ -675,10 +690,104 @@ void Polar::createSpeedBullets()
 			dc->DrawCircle(ptArr[i],radius);												// draw the bullet
 			ptArr[i].x = ptArr[i].y = 0;
 			}
+			else
+				break;
 		}
 	}
 
 	dc->SetPen(p);
+}
+
+void Polar::createSpeedBulletsMax()
+{
+	int radius = 5;
+	double length = dist;												
+	dc->SetPen( wxPen( wxColor(0,0,0), 1 ) ); 
+	int c= 0;
+	int end = 10;
+	int xt, yt, pc;
+	wxPoint ptArr[360];
+	pol temp[1];
+
+		for(int n = 0; n < WINDDIR; n++)
+		{
+			temp[0].wdir[n] = 0;
+			temp[0].count[n] = 0;
+			temp[0].scount[n] = 0;
+			temp[0].wdirMax[n] = 0;
+			temp[0].wdirTotal[n] = 0;
+			temp[0].winddir.clear();
+		}
+
+	int linelength;
+	wxColour colour,brush;
+	wxPen p = dc->GetPen();													// get actual Pen for restoring later
+	for(int wsp = 0; wsp < end; wsp++)									// go thru all winddirection-structures depending on choiocebox max. all
+	{
+		for(int dir = 0; dir < WINDDIR; dir++)
+		{
+			if(windsp[wsp].count[dir] <= 0) continue;							// no data ? continue
+			if(wsp == 0)
+			{
+				temp[0].wdirMax[dir] = windsp[wsp].wdirMax[dir];
+			}
+			else
+			{
+				if(temp[0].wdirMax[dir] < windsp[wsp].wdirMax[dir])
+					temp[0].wdirMax[dir] = windsp[wsp].wdirMax[dir];
+			}
+
+		}
+	}
+
+
+
+
+	for(int wsp = 0; wsp < end; wsp++)									// go thru all winddirection-structures depending on choiocebox degrees
+	{
+		pc = 0;
+		colour = windColor[wsp]; brush = windColor[wsp];
+		for(int dir = 0; dir < WINDDIR; dir++)
+		{
+			switch(mode)
+			{
+			case 0:
+				linelength = temp[0].wdirTotal[dir]*length;			// calculate distance from centerpoint for speed
+				break;
+			case 1:
+			case 2:
+			case 3:
+				linelength = (temp[0].wdirMax[dir])*length;
+				break;
+			}
+			xt = wxRound(cos(toRad(dir*8+24))*linelength+center.x);					// calculate the point for the bullet
+			yt = wxRound(sin(toRad(dir*8+24))*linelength+center.y);
+			wxPoint pt(xt,yt);
+			if(pt != wxPoint(center.x,center.y))
+				ptArr[pc++] = pt;
+		}
+	}
+
+		colour = windColor[GREEN]; brush = windColor[GREEN];
+		if(pc > 2)														//Draw splines, needs min. 3 points
+		{
+			dc->SetPen(wxPen(colour,3));
+			dc->DrawSpline(pc,ptArr);
+		}
+
+
+		dc->SetBrush( brush );
+		for(int i = 0; i < 360; i++)
+		{
+			if(ptArr[i].x != 0 && ptArr[i].y != 0)
+			{
+			dc->SetPen(wxPen(wxColour(0,0,0),2));
+			dc->DrawCircle(ptArr[i],radius);												// draw the bullet
+			ptArr[i].x = ptArr[i].y = 0;
+			}
+			else
+				break;
+		}
 }
 
 double Polar::toRad(int angle)
@@ -954,7 +1063,7 @@ void Polar::loadPolar()
 			while(tkz.HasMoreTokens())
 			{
 				i++;
-				if(i > 10) break;
+				if(i > 11) break;
 				s = tkz.GetNextToken();
 				if(s == _T("0") && (mode == 1 || mode == 2)) continue;
 				dlg->m_gridEdit->SetCellValue(row,col,s);
@@ -1080,8 +1189,7 @@ void Polar::setSentence(wxString sentence)
 
 ////////////// Filter  Dialog ////////////////////////
 
-FilterDlg::FilterDlg( PolarDialog* parent, Polar* polar, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) 
-	: wxDialog( parent, id, title, pos, size, style )
+FilterDlg::FilterDlg( PolarDialog* parent, Polar* polar, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	dlg = parent;
 	this->polar = polar;
@@ -1089,129 +1197,134 @@ FilterDlg::FilterDlg( PolarDialog* parent, Polar* polar, wxWindowID id, const wx
 
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
-
+	
 	wxBoxSizer* bSizer51;
 	bSizer51 = new wxBoxSizer( wxVERTICAL );
-
+	
 	m_notebook6 = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
 	m_panel4 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	wxBoxSizer* bSizer8;
 	bSizer8 = new wxBoxSizer( wxVERTICAL );
-
-
+	
+	
 	bSizer8->Add( 0, 20, 0, 0, 5 );
-
+	
 	wxFlexGridSizer* fgSizer2;
-	fgSizer2 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer2 = new wxFlexGridSizer( 3, 2, 0, 0 );
 	fgSizer2->SetFlexibleDirection( wxBOTH );
 	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-
+	
+	m_checkBoxMax = new wxCheckBox( m_panel4, wxID_ANY, _("Use Max-Speed only"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxMax->SetValue(true); 
+	fgSizer2->Add( m_checkBoxMax, 0, wxALL, 5 );
+	
+	
+	fgSizer2->Add( 0, 0, 1, wxEXPAND, 5 );
+	
 	m_checkBoxAverage = new wxCheckBox( m_panel4, wxID_ANY, _("Use Average from all speed-data"), wxDefaultPosition, wxDefaultSize, 0 );
 	fgSizer2->Add( m_checkBoxAverage, 0, wxALL, 5 );
-
-
+	
+	
 	fgSizer2->Add( 0, 0, 1, wxEXPAND, 5 );
-
+	
 	m_checkBoxRangePercent = new wxCheckBox( m_panel4, wxID_ANY, _("Range from maximum speed to minus"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_checkBoxRangePercent->SetValue(true); 
 	m_checkBoxRangePercent->SetToolTip( _("Example:\nMax-Speed = 2,5 kts\nSelected 10 % = 0,25 kts\nRange from 2,25 to 2,5 kts") );
-
+	
 	fgSizer2->Add( m_checkBoxRangePercent, 0, wxALL, 5 );
-
+	
 	wxString m_choice6Choices[] = { _T("5 %"), _T("10 %"), _T("15 %"), _T("20 %"), _T("25 %"), _T("50 %"), _T("75 %") };
 	int m_choice6NChoices = sizeof( m_choice6Choices ) / sizeof( wxString );
 	m_choice6 = new wxChoice( m_panel4, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice6NChoices, m_choice6Choices, 0 );
 	m_choice6->SetSelection( 1 );
 	fgSizer2->Add( m_choice6, 0, wxRIGHT|wxLEFT, 5 );
-
-
+	
+	
 	bSizer8->Add( fgSizer2, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
+	
+	
 	m_panel4->SetSizer( bSizer8 );
 	m_panel4->Layout();
 	bSizer8->Fit( m_panel4 );
 	m_notebook6->AddPage( m_panel4, _("Range"), true );
 	m_panel33 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	bSizer54 = new wxBoxSizer( wxVERTICAL );
-
-	m_staticText152 = new wxStaticText( m_panel33, wxID_ANY, _("Work in progress"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText152->Wrap( -1 );
-	bSizer54->Add( m_staticText152, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
+	
+//	m_staticText152 = new wxStaticText( m_panel33, wxID_ANY, _("Work in irogress"), wxDefaultPosition, wxDefaultSize, 0 );
+//	m_staticText152->Wrap( -1 );
+//	bSizer54->Add( m_staticText152, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
 	bSizer54->Add( 0, 40, 0, 0, 5 );
-
+	
 	fgSizer50 = new wxFlexGridSizer( 0, 2, 0, 0 );
 	fgSizer50->SetFlexibleDirection( wxBOTH );
 	fgSizer50->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-
-
+	
+	
 	bSizer54->Add( fgSizer50, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
-
-
+	
+	
 	m_panel33->SetSizer( bSizer54 );
 	m_panel33->Layout();
 	bSizer54->Fit( m_panel33 );
 	m_notebook6->AddPage( m_panel33, _("Sails"), false );
 	m_panel34 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	bSizer52 = new wxBoxSizer( wxVERTICAL );
-
-	m_staticText153 = new wxStaticText( m_panel34, wxID_ANY, _("Work in progess"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText153->Wrap( -1 );
-	bSizer52->Add( m_staticText153, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
-
+	
+//	m_staticText153 = new wxStaticText( m_panel34, wxID_ANY, _("Work in progess"), wxDefaultPosition, wxDefaultSize, 0 );
+//	m_staticText153->Wrap( -1 );
+//	bSizer52->Add( m_staticText153, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
 	wxBoxSizer* bSizer541;
 	bSizer541 = new wxBoxSizer( wxHORIZONTAL );
-
+	
 	m_staticText154 = new wxStaticText( m_panel34, wxID_ANY, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText154->Wrap( -1 );
 	bSizer541->Add( m_staticText154, 0, wxALL, 5 );
-
-
+	
+	
 	bSizer52->Add( bSizer541, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
+	
+	
 	bSizer52->Add( 0, 0, 0, 0, 5 );
-
-
+	
+	
 	m_panel34->SetSizer( bSizer52 );
 	m_panel34->Layout();
 	bSizer52->Fit( m_panel34 );
 	m_notebook6->AddPage( m_panel34, _("Wavehight"), false );
-
+	
 	bSizer51->Add( m_notebook6, 1, wxEXPAND | wxALL, 5 );
-
+	
 	m_sdbSizer11 = new wxStdDialogButtonSizer();
 	m_sdbSizer11OK = new wxButton( this, wxID_OK );
 	m_sdbSizer11->AddButton( m_sdbSizer11OK );
 	m_sdbSizer11Cancel = new wxButton( this, wxID_CANCEL );
 	m_sdbSizer11->AddButton( m_sdbSizer11Cancel );
 	m_sdbSizer11->Realize();
-
+	
 	bSizer51->Add( m_sdbSizer11, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
-
-
+	
+	
 	this->SetSizer( bSizer51 );
 	this->Layout();
-
+	
 	this->Centre( wxBOTH );
 	this->Centre( wxBOTH );
-
+	
 	// Connect Events
+//	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( FilterDlg::init ) );
 	m_sdbSizer11OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlg::OnOKButtonClick ), NULL, this );
-
 	init();
-
 }
 
 FilterDlg::~FilterDlg()
 {
 	// Disconnect Events
+//	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( FilterDlg::PolarDlgOnInitDialog ) );
 	m_sdbSizer11OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlg::OnOKButtonClick ), NULL, this );
-	//	m_buttonSailsReset->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( LogbookDialog::OnButtonClickResetSails ), NULL, this );	
+	
 }
-
 void FilterDlg::init()
 {
 	if(opt->abrSails.Count() != 0)

@@ -23,6 +23,7 @@
 #include <wx/sizer.h>
 #include <wx/panel.h>
 #include <wx/grid.h>
+#include <wx/tglbtn.h>
 #include <wx/splitter.h>
 #include <wx/dialog.h>
 #include <wx/gauge.h>
@@ -31,12 +32,14 @@
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/notebook.h>
-#include <wx/tglbtn.h>
+
+///////////////////////////////////////////////////////////////////////////
+
 
 ///////////////////////////////////////////////////////////////////////////////
-/// Class PolarDialog
+/// Class PolarDlg
 ///////////////////////////////////////////////////////////////////////////////
-class PolarGui : public wxDialog
+class PolarDlg : public wxDialog
 {
 	private:
 	
@@ -56,16 +59,15 @@ class PolarGui : public wxDialog
 		wxButton* m_buttonFilterPolar;
 		wxStaticLine* m_staticline421;
 		wxButton* m_button61;
-		wxStaticLine* m_staticline431;
 		wxButton* m_buttonSavePolar;
 		wxButton* m_buttonLoad;
 		wxStaticLine* m_staticline45;
 		wxButton* m_buttonClearData;
 		wxToggleButton* m_toggleBtnRecord;
-		wxStaticText* m_staticTextEngine;
 		
 		// Virtual event handlers, overide them in your derived class
-		virtual void PolarDialogOnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		virtual void PolarDlgOnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		virtual void OnSizePolarDlg( wxSizeEvent& event ) { event.Skip(); }
 		virtual void OnChoiceMode( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChoicePolarKnots( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnChoiceDegreesPolar( wxCommandEvent& event ) { event.Skip(); }
@@ -81,26 +83,84 @@ class PolarGui : public wxDialog
 		virtual void OnGridCellChange( wxGridEvent& event ) { event.Skip(); }
 		virtual void OnButtonClickClearData( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnToggleButtonRecord( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnSizePolarDialog( wxSizeEvent& event ) { event.Skip(); }
 		
 	
 	public:
 		wxBoxSizer* bSizerPolar;
 		wxChoice* m_choiceMode;
+		wxStaticLine* m_staticline431;
 		wxSplitterWindow* m_splitter1;
 		wxPanel* m_panelPolar;
-		wxPanel* m_panel34;
 		wxPanel* m_panel6;
 		wxGrid* m_gridEdit;
+		wxStaticText* m_staticTextEngine;
 		
-		PolarGui( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Polar Diagram"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 968,602 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER ); 
-		~PolarGui();
+		PolarDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Polar Diagram"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 968,602 ), long style = wxDEFAULT_DIALOG_STYLE|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxRESIZE_BORDER );
+		~PolarDlg();
 		
 		void m_splitter1OnIdle( wxIdleEvent& )
 		{
 			m_splitter1->SetSashPosition( 400 );
-			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( PolarGui::m_splitter1OnIdle ), NULL, this );
+			m_splitter1->Disconnect( wxEVT_IDLE, wxIdleEventHandler( PolarDlg::m_splitter1OnIdle ), NULL, this );
 		}
+	
+};
+/*
+///////////////////////////////////////////////////////////////////////////////
+/// Class CollectDlg
+///////////////////////////////////////////////////////////////////////////////
+class CollectDlg : public wxDialog public wxDialog 
+{
+	private:
+	
+	protected:
+		wxStaticText* m_staticText9;
+		wxStaticText* m_staticTextFile;
+		wxGauge* m_gauge1;
+	
+	public:
+		
+		CollectDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 338,74 ), long style = 0 ); CollectDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 338,74 ), long style = 0 ); 
+		~CollectDlg();
+	
 };
 
+///////////////////////////////////////////////////////////////////////////////
+/// Class FilterDlg
+///////////////////////////////////////////////////////////////////////////////
+class FilterDlg : public wxDialog public wxDialog 
+{
+	private:
+		wxPanel* m_panel33;
+		wxFlexGridSizer* fgSizer50;
+	
+	protected:
+		wxNotebook* m_notebook6;
+		wxPanel* m_panel4;
+		wxCheckBox* m_checkBox3;
+		wxCheckBox* m_checkBoxAverage;
+		wxCheckBox* m_checkBoxRangePercent;
+		wxChoice* m_choice6;
+		wxStaticText* m_staticText152;
+		wxPanel* m_panel34;
+		wxStaticText* m_staticText153;
+		wxStaticText* m_staticText154;
+		wxStdDialogButtonSizer* m_sdbSizer11;
+		wxButton* m_sdbSizer11OK;
+		wxButton* m_sdbSizer11Cancel;
+		
+		// Virtual event handlers, overide them in your derived class
+		virtual void PolarDlgOnInitDialog( wxInitDialogEvent& event ) { event.Skip(); }
+		virtual void OnOKButtonClick( wxCommandEvent& event ) { event.Skip(); }
+		
+	
+	public:
+		wxBoxSizer* bSizer54;
+		wxBoxSizer* bSizer52;
+		
+		FilterDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Polar Filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 451,470 ), long style = wxDEFAULT_DIALOG_STYLE ); FilterDlg( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Polar Filter"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 451,470 ), long style = wxDEFAULT_DIALOG_STYLE ); 
+		~FilterDlg();
+	
+};
+*/
 #endif //__POLARGUI_H__

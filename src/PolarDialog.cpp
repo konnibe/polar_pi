@@ -7,7 +7,7 @@
 
 PolarDialog::PolarDialog( wxWindow* parent, polar_pi* pol )
 :
-PolarGui( parent )
+PolarDlg( parent )
 {
 	plugin = pol;
 	polar = new Polar(this);
@@ -83,7 +83,7 @@ void PolarDialog::OnTimer(wxTimerEvent& event)
 	timer->Start(1000);
 }
 
-void PolarDialog::PolarDialogOnInitDialog( wxInitDialogEvent& event )
+void PolarDialog::PolarDlgOnInitDialog( wxInitDialogEvent& event )
 {
 //	m_splitter1->Unsplit();
 /*	m_gridEdit->GetGridCornerLabelWindow()->SetFocus();
@@ -107,7 +107,7 @@ void PolarDialog::OnSizePolar( wxSizeEvent& event )
 	m_panelPolar->Refresh();
 }
 
-void PolarDialog::OnSizePolarDialog( wxSizeEvent& event )
+void PolarDialog::OnSizePolarDlg( wxSizeEvent& event )
 {
 	Layout();
 	Refresh();

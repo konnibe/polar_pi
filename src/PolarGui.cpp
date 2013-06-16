@@ -6,10 +6,10 @@
 ///////////////////////////////////////////////////////////////////////////
 
 #include "PolarGui.h"
-
+#include "Polar.h"
 ///////////////////////////////////////////////////////////////////////////
 
-PolarGui::PolarGui( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+PolarDlg::PolarDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
 {
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
 	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
@@ -119,10 +119,10 @@ PolarGui::PolarGui( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	m_staticline45 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
 	bSizer48->Add( m_staticline45, 0, wxEXPAND | wxALL, 0 );
 	
-	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_3DBORDER|wxSP_3DSASH|wxSP_NO_XP_THEME );
-	m_splitter1->Connect( wxEVT_IDLE, wxIdleEventHandler( PolarGui::m_splitter1OnIdle ), NULL, this );
-	m_splitter1->SetMinimumPaneSize( 10 );;
-
+	m_splitter1 = new wxSplitterWindow( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D|wxSP_3DBORDER|wxSP_3DSASH|wxSP_LIVE_UPDATE|wxSP_NO_XP_THEME );
+	m_splitter1->Connect( wxEVT_IDLE, wxIdleEventHandler( PolarDlg::m_splitter1OnIdle ), NULL, this );
+	m_splitter1->SetMinimumPaneSize( 10 );
+	
 	m_panelPolar = new wxPanel( m_splitter1, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
 	m_panelPolar->SetBackgroundColour( wxColour( 255, 255, 255 ) );
 	m_panelPolar->SetMinSize( wxSize( 10,-1 ) );
@@ -197,14 +197,15 @@ PolarGui::PolarGui( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	
 	// Cell Defaults
 	m_gridEdit->SetDefaultCellAlignment( wxALIGN_RIGHT, wxALIGN_CENTRE );
-	bSizer13->Add( m_gridEdit, 0, wxALL, 0 );
-
+	bSizer13->Add( m_gridEdit, 0, wxALL|wxEXPAND, 0 );
+	
 	m_staticTextEngine = new wxStaticText( m_panel6, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticTextEngine->Wrap( -1 );
 	bSizer13->Add( m_staticTextEngine, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
+	
 	bSizer13->Add( 0, 0, 1, wxEXPAND, 5 );
-
+	
 	wxBoxSizer* bSizer12;
 	bSizer12 = new wxBoxSizer( wxHORIZONTAL );
 	
@@ -221,7 +222,7 @@ PolarGui::PolarGui( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	m_panel6->SetSizer( bSizer13 );
 	m_panel6->Layout();
 	bSizer13->Fit( m_panel6 );
-	m_splitter1->SplitVertically( m_panelPolar, m_panel6, 450 );
+	m_splitter1->SplitVertically( m_panelPolar, m_panel6, 10 );
 	bSizer48->Add( m_splitter1, 1, wxEXPAND, 5 );
 	
 	
@@ -235,43 +236,215 @@ PolarGui::PolarGui( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	this->Centre( wxBOTH );
 	
 	// Connect Events
-	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PolarGui::PolarDialogOnInitDialog ) );
-	m_choiceMode->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceMode ), NULL, this );
-	m_choiceRingsPolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoicePolarKnots ), NULL, this );
-	m_choiceDegreesPolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceDegreesPolar ), NULL, this );
-	m_choiceWindPolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceWindPolar ), NULL, this );
-	m_choiceSourcePolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceSourcePolar ), NULL, this );
-	m_buttonFilterPolar->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickFilterPolar ), NULL, this );
-	m_button61->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonCreatePolar ), NULL, this );
-	m_buttonSavePolar->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickSavePolar ), NULL, this );
-	m_buttonLoad->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickLoad ), NULL, this );
-	m_splitter1->Connect( wxEVT_SIZE, wxSizeEventHandler( PolarGui::OnSizesplitter1 ), NULL, this );
-	m_splitter1->Connect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( PolarGui::OnSplitterSashPosChanged ), NULL, this );
-	m_panelPolar->Connect( wxEVT_PAINT, wxPaintEventHandler( PolarGui::OnPaintPolar ), NULL, this );
-	m_gridEdit->Connect( wxEVT_GRID_CELL_CHANGE, wxGridEventHandler( PolarGui::OnGridCellChange ), NULL, this );
-	m_buttonClearData->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickClearData ), NULL, this );
-	m_toggleBtnRecord->Connect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnToggleButtonRecord ), NULL, this );
-	this->Connect( wxEVT_SIZE, wxSizeEventHandler( PolarGui::OnSizePolarDialog ) );
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PolarDlg::PolarDlgOnInitDialog ) );this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PolarDlg::PolarDlgOnInitDialog ) );
+	this->Connect( wxEVT_SIZE, wxSizeEventHandler( PolarDlg::OnSizePolarDlg ) );this->Connect( wxEVT_SIZE, wxSizeEventHandler( PolarDlg::OnSizePolarDlg ) );
+	m_choiceMode->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceMode ), NULL, this );
+	m_choiceRingsPolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoicePolarKnots ), NULL, this );
+	m_choiceDegreesPolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceDegreesPolar ), NULL, this );
+	m_choiceWindPolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceWindPolar ), NULL, this );
+	m_choiceSourcePolar->Connect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceSourcePolar ), NULL, this );
+	m_buttonFilterPolar->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickFilterPolar ), NULL, this );
+	m_button61->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonCreatePolar ), NULL, this );
+	m_buttonSavePolar->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickSavePolar ), NULL, this );
+	m_buttonLoad->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickLoad ), NULL, this );
+	m_splitter1->Connect( wxEVT_SIZE, wxSizeEventHandler( PolarDlg::OnSizesplitter1 ), NULL, this );
+	m_splitter1->Connect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( PolarDlg::OnSplitterSashPosChanged ), NULL, this );
+	m_panelPolar->Connect( wxEVT_PAINT, wxPaintEventHandler( PolarDlg::OnPaintPolar ), NULL, this );
+	m_gridEdit->Connect( wxEVT_GRID_CELL_CHANGE, wxGridEventHandler( PolarDlg::OnGridCellChange ), NULL, this );
+	m_buttonClearData->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickClearData ), NULL, this );
+	m_toggleBtnRecord->Connect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnToggleButtonRecord ), NULL, this );
 }
 
-PolarGui::~PolarGui()
+PolarDlg::~PolarDlg()
 {
 	// Disconnect Events
-	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PolarGui::PolarDialogOnInitDialog ) );
-	m_choiceMode->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceMode ), NULL, this );
-	m_choiceRingsPolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoicePolarKnots ), NULL, this );
-	m_choiceDegreesPolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceDegreesPolar ), NULL, this );
-	m_choiceWindPolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceWindPolar ), NULL, this );
-	m_choiceSourcePolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarGui::OnChoiceSourcePolar ), NULL, this );
-	m_buttonFilterPolar->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickFilterPolar ), NULL, this );
-	m_button61->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonCreatePolar ), NULL, this );
-	m_buttonSavePolar->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickSavePolar ), NULL, this );
-	m_buttonLoad->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickLoad ), NULL, this );
-	m_splitter1->Disconnect( wxEVT_SIZE, wxSizeEventHandler( PolarGui::OnSizesplitter1 ), NULL, this );
-	m_splitter1->Disconnect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( PolarGui::OnSplitterSashPosChanged ), NULL, this );
-	m_panelPolar->Disconnect( wxEVT_PAINT, wxPaintEventHandler( PolarGui::OnPaintPolar ), NULL, this );
-	m_gridEdit->Disconnect( wxEVT_GRID_CELL_CHANGE, wxGridEventHandler( PolarGui::OnGridCellChange ), NULL, this );
-	m_buttonClearData->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnButtonClickClearData ), NULL, this );
-	m_toggleBtnRecord->Disconnect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( PolarGui::OnToggleButtonRecord ), NULL, this );
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PolarDlg::PolarDlgOnInitDialog ) );this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( PolarDlg::PolarDlgOnInitDialog ) );
+	this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( PolarDlg::OnSizePolarDlg ) );this->Disconnect( wxEVT_SIZE, wxSizeEventHandler( PolarDlg::OnSizePolarDlg ) );
+	m_choiceMode->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceMode ), NULL, this );
+	m_choiceRingsPolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoicePolarKnots ), NULL, this );
+	m_choiceDegreesPolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceDegreesPolar ), NULL, this );
+	m_choiceWindPolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceWindPolar ), NULL, this );
+	m_choiceSourcePolar->Disconnect( wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler( PolarDlg::OnChoiceSourcePolar ), NULL, this );
+	m_buttonFilterPolar->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickFilterPolar ), NULL, this );
+	m_button61->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonCreatePolar ), NULL, this );
+	m_buttonSavePolar->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickSavePolar ), NULL, this );
+	m_buttonLoad->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickLoad ), NULL, this );
+	m_splitter1->Disconnect( wxEVT_SIZE, wxSizeEventHandler( PolarDlg::OnSizesplitter1 ), NULL, this );
+	m_splitter1->Disconnect( wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED, wxSplitterEventHandler( PolarDlg::OnSplitterSashPosChanged ), NULL, this );
+	m_panelPolar->Disconnect( wxEVT_PAINT, wxPaintEventHandler( PolarDlg::OnPaintPolar ), NULL, this );
+	m_gridEdit->Disconnect( wxEVT_GRID_CELL_CHANGE, wxGridEventHandler( PolarDlg::OnGridCellChange ), NULL, this );
+	m_buttonClearData->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnButtonClickClearData ), NULL, this );
+	m_toggleBtnRecord->Disconnect( wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler( PolarDlg::OnToggleButtonRecord ), NULL, this );
 	
 }
+/*
+CollectDlg::CollectDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer10;
+	bSizer10 = new wxBoxSizer( wxVERTICAL );
+	
+	wxBoxSizer* bSizer11;
+	bSizer11 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText9 = new wxStaticText( this, wxID_ANY, _("Collecting Data from: "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText9->Wrap( -1 );
+	bSizer11->Add( m_staticText9, 0, wxALL, 5 );
+	
+	m_staticTextFile = new wxStaticText( this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticTextFile->Wrap( -1 );
+	bSizer11->Add( m_staticTextFile, 0, wxALL, 5 );
+	
+	
+	bSizer10->Add( bSizer11, 0, 0, 5 );
+	
+	m_gauge1 = new wxGauge( this, wxID_ANY, 100, wxDefaultPosition, wxSize( 300,-1 ), wxGA_HORIZONTAL );
+	m_gauge1->SetValue( 50 ); 
+	bSizer10->Add( m_gauge1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	this->SetSizer( bSizer10 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	this->Centre( wxBOTH );
+}
+
+CollectDlg::~CollectDlg()
+{
+}
+
+FilterDlg::FilterDlg( wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style ) : wxDialog( parent, id, title, pos, size, style )
+{
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+	
+	wxBoxSizer* bSizer51;
+	bSizer51 = new wxBoxSizer( wxVERTICAL );
+	
+	m_notebook6 = new wxNotebook( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, 0 );
+	m_panel4 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	wxBoxSizer* bSizer8;
+	bSizer8 = new wxBoxSizer( wxVERTICAL );
+	
+	
+	bSizer8->Add( 0, 20, 0, 0, 5 );
+	
+	wxFlexGridSizer* fgSizer2;
+	fgSizer2 = new wxFlexGridSizer( 3, 2, 0, 0 );
+	fgSizer2->SetFlexibleDirection( wxBOTH );
+	fgSizer2->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	m_checkBox3 = new wxCheckBox( m_panel4, wxID_ANY, _("Use Max-Speed only"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBox3->SetValue(true); 
+	fgSizer2->Add( m_checkBox3, 0, wxALL, 5 );
+	
+	
+	fgSizer2->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_checkBoxAverage = new wxCheckBox( m_panel4, wxID_ANY, _("Use Average from all speed-data"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer2->Add( m_checkBoxAverage, 0, wxALL, 5 );
+	
+	
+	fgSizer2->Add( 0, 0, 1, wxEXPAND, 5 );
+	
+	m_checkBoxRangePercent = new wxCheckBox( m_panel4, wxID_ANY, _("Range from maximum speed to minus"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_checkBoxRangePercent->SetToolTip( _("Example:\nMax-Speed = 2,5 kts\nSelected 10 % = 0,25 kts\nRange from 2,25 to 2,5 kts") );
+	
+	fgSizer2->Add( m_checkBoxRangePercent, 0, wxALL, 5 );
+	
+	wxString m_choice6Choices[] = { _("5 %"), _("10 %"), _("15 %"), _("20 %"), _("25 %"), _("50 %"), _("75 %") };
+	int m_choice6NChoices = sizeof( m_choice6Choices ) / sizeof( wxString );
+	m_choice6 = new wxChoice( m_panel4, wxID_ANY, wxDefaultPosition, wxDefaultSize, m_choice6NChoices, m_choice6Choices, 0 );
+	m_choice6->SetSelection( 1 );
+	fgSizer2->Add( m_choice6, 0, wxRIGHT|wxLEFT, 5 );
+	
+	
+	bSizer8->Add( fgSizer2, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	m_panel4->SetSizer( bSizer8 );
+	m_panel4->Layout();
+	bSizer8->Fit( m_panel4 );
+	m_notebook6->AddPage( m_panel4, _("Range"), true );
+	m_panel33 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	bSizer54 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText152 = new wxStaticText( m_panel33, wxID_ANY, _("Work in irogress"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText152->Wrap( -1 );
+	bSizer54->Add( m_staticText152, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer54->Add( 0, 40, 0, 0, 5 );
+	
+	fgSizer50 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer50->SetFlexibleDirection( wxBOTH );
+	fgSizer50->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	
+	
+	bSizer54->Add( fgSizer50, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5 );
+	
+	
+	m_panel33->SetSizer( bSizer54 );
+	m_panel33->Layout();
+	bSizer54->Fit( m_panel33 );
+	m_notebook6->AddPage( m_panel33, _("Sails"), false );
+	m_panel34 = new wxPanel( m_notebook6, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL );
+	bSizer52 = new wxBoxSizer( wxVERTICAL );
+	
+	m_staticText153 = new wxStaticText( m_panel34, wxID_ANY, _("Work in progess"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText153->Wrap( -1 );
+	bSizer52->Add( m_staticText153, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	wxBoxSizer* bSizer541;
+	bSizer541 = new wxBoxSizer( wxHORIZONTAL );
+	
+	m_staticText154 = new wxStaticText( m_panel34, wxID_ANY, _("MyLabel"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText154->Wrap( -1 );
+	bSizer541->Add( m_staticText154, 0, wxALL, 5 );
+	
+	
+	bSizer52->Add( bSizer541, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	bSizer52->Add( 0, 0, 0, 0, 5 );
+	
+	
+	m_panel34->SetSizer( bSizer52 );
+	m_panel34->Layout();
+	bSizer52->Fit( m_panel34 );
+	m_notebook6->AddPage( m_panel34, _("Wavehight"), false );
+	
+	bSizer51->Add( m_notebook6, 1, wxEXPAND | wxALL, 5 );
+	
+	m_sdbSizer11 = new wxStdDialogButtonSizer();
+	m_sdbSizer11OK = new wxButton( this, wxID_OK );
+	m_sdbSizer11->AddButton( m_sdbSizer11OK );
+	m_sdbSizer11Cancel = new wxButton( this, wxID_CANCEL );
+	m_sdbSizer11->AddButton( m_sdbSizer11Cancel );
+	m_sdbSizer11->Realize();
+	
+	bSizer51->Add( m_sdbSizer11, 0, wxALIGN_CENTER_HORIZONTAL, 5 );
+	
+	
+	this->SetSizer( bSizer51 );
+	this->Layout();
+	
+	this->Centre( wxBOTH );
+	this->Centre( wxBOTH );
+	
+	// Connect Events
+	this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( FilterDlg::PolarDlgOnInitDialog ) );this->Connect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( FilterDlg::PolarDlgOnInitDialog ) );
+	m_sdbSizer11OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlg::OnOKButtonClick ), NULL, this );
+}
+
+FilterDlg::~FilterDlg()
+{
+	// Disconnect Events
+	this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( FilterDlg::PolarDlgOnInitDialog ) );this->Disconnect( wxEVT_INIT_DIALOG, wxInitDialogEventHandler( FilterDlg::PolarDlgOnInitDialog ) );
+	m_sdbSizer11OK->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( FilterDlg::OnOKButtonClick ), NULL, this );
+	
+}
+*/

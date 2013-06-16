@@ -8,12 +8,17 @@
 #include <wx/dynarray.h>
 #include <map>
 
+#include "nmea0183.h"
+
 WX_DEFINE_ARRAY_DOUBLE(int, ArrayOfDouble);
 
 #define WINDDIR 40
 
+class PolarDialog;
+class polar_pi;
 class FilterDlg;
 class Options;
+//class NMEA0183;
 
 class Polar
 {
@@ -73,6 +78,7 @@ public:
 	void createDiagram(wxDC& dc);
 	void createPolar();
 	void createSpeedBullets();
+	void createSpeedBulletsMax();
 	void save();
 	void showDlg();
 	void source(int sel);
@@ -101,7 +107,7 @@ private:
 	void   loadVDR();
 //	void calculateData();
 };
-
+#endif
 ///////////////////////////////////////////////////////////////////////////
 // C++ code generated with wxFormBuilder (version Jun 30 2011)
 // http://www.wxformbuilder.org/
@@ -168,6 +174,7 @@ class FilterDlg : public wxDialog
 		wxBoxSizer* bSizer54;
 		wxBoxSizer* bSizer52;
 		wxBoxSizer* bSizer53;
+		wxCheckBox* m_checkBoxMax;
 		wxCheckBox* m_checkBoxAverage;
 		wxCheckBox* m_checkBoxRangePercent;
 		wxChoice* m_choice6;
@@ -204,4 +211,3 @@ class CollectDlg : public wxDialog
 };
 
 #endif 
-#endif
