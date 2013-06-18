@@ -75,7 +75,6 @@ polar_pi::polar_pi(void *ppimgr)
 {
       // Create the PlugIn icons
       initialize_images();
-
 }
 
 polar_pi::~polar_pi(void)
