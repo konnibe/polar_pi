@@ -215,8 +215,7 @@ void Polar::loadVDR()
 		100, dlg,  wxFRAME_NO_TASKBAR | wxPD_AUTO_HIDE | wxPD_CAN_ABORT );
 	progressRead.Fit(); 
 
-	wxString s = wxEmptyString; int i=0;
-	long long offsetStart = input.TellI(); 
+	wxString s = wxEmptyString;
 	do{
 		long long p = input.TellI();
 		long long ii = input.GetLength();
@@ -296,7 +295,6 @@ void Polar::createDiagram(wxDC& dc)
 {
 	center = dlg->m_panelPolar->GetSize();
 	center.x = center.x / 2 - 150;
-	int f = dlg->bSizerPolar->GetSize().y;
 	center.y = (center.y / 2) + (dlg->bSizerPolar->GetSize().GetHeight() / 2);
 	rSpeed[0] = center.y - dlg->bSizerPolar->GetSize().GetHeight()-40;
 	dist = rSpeed[0] / knots;
@@ -365,7 +363,7 @@ void Polar::Render()
 		dc->DrawText(_("Filtered by:"), center.x+rSpeed[(int)knots-1]+100, 60);
 
 		wxString sail = wxEmptyString;  
-		unsigned int n = 0, y = 80;
+		unsigned int y = 80;
 
 		for(unsigned i = 0; i < 14; i++)
 		{
@@ -406,7 +404,6 @@ void Polar::createPolar()
 		wxFileInputStream stream( files[i] );									// get trough the files
 		wxTextInputStream in(stream);	
 		wxString wdirstr,wsp;
-		int winddir = -1;
 		double speed = -1;
 
 		while(!stream.Eof())
@@ -476,10 +473,10 @@ void Polar::createPolar()
 						s.Replace(_T("\n"),_T(","));
 						wxStringTokenizer tkz(s,_T(","));
 						if(tkz.CountTokens() != sails.GetCount())
-						{ nextline = true; break; }
+						  { nextline = true; break; }
 						else
 						{
-							int ok = 0;
+							unsigned int ok = 0;
 							while(tkz.HasMoreTokens())
 							{
 								wxString t = tkz.GetNextToken().Trim(false);
@@ -618,7 +615,6 @@ void Polar::createSpeedBullets()
 	int radius = 5;
 	double length = dist;												
 	dc->SetPen( wxPen( wxColor(0,0,0), 1 ) ); 
-	int c= 0;
 	int end;;
 	int xt, yt, pc;
 	wxPoint ptArr[360];
@@ -703,7 +699,6 @@ void Polar::createSpeedBulletsMax()
 	int radius = 5;
 	double length = dist;												
 	dc->SetPen( wxPen( wxColor(0,0,0), 1 ) ); 
-	int c= 0;
 	int end = 10;
 	int xt, yt, pc;
 	wxPoint ptArr[360];
@@ -816,14 +811,20 @@ void Polar::save()
 	double data;
 
 	wxFileDialog saveFileDialog(dlg, _("Save Polar File"), _T(""), _T("Polar"),
-		_T("OCPN-Format(*.pol)|*.pol|QTVlm(*.pol)|*.pol|Maxsea(*.pol)|*.pol"), 
+		_T("OCPN-Format(*.pol)|*.pol|QTVlm(*.pol)|*.pol|Maxsea(*.pol)|*.pol|CVS-Format(*csv)|*.csv"), 
 		wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
 	if (saveFileDialog.ShowModal() == wxID_CANCEL)
 		return;
 
 	int sel = saveFileDialog.GetFilterIndex();
-
+	wxString saveFile = saveFileDialog.GetPath();
+	
+	if(sel == 3 && !saveFile.EndsWith(_T(".csv")))
+	  saveFile += _T(".csv");
+	else if(sel != 3 && !saveFile.EndsWith(_T(".pol")))
+	  saveFile += _T(".pol");
+	
 	struct pol save[10];
 	for(int i = 0; i < 10; i++)	
 		save[i] = windsp[i];
@@ -851,7 +852,7 @@ void Polar::save()
 		}
 	}
 
-	wxFileOutputStream output( saveFileDialog.GetPath() );
+	wxFileOutputStream output( saveFile);
 	wxTextOutputStream polarFile(output);
 
 	if(sel == 0)
@@ -873,11 +874,12 @@ void Polar::save()
 					data = save[sp].wdirMax[dir];
 					break;
 				}
-				polarFile << (dir+3)*8 << _T(" ");
-				if(save[sp].count[dir] > 0 && data >= 0.0)
-					polarFile << wxString::Format(_T("%.2f "),data);
-				else
+				  polarFile << (dir+3)*8 << _T(" ");
+				  if(save[sp].count[dir] > 0 && data >= 0.0)
+					  polarFile << wxString::Format(_T("%.2f "),data);
+				  else
 					polarFile << _T(" ");
+				
 			}
 			polarFile << _T("\n");
 		}
@@ -924,7 +926,7 @@ void Polar::save()
 			polarFile << _T("0\n");
 		}
 	}
-	else
+	else if(sel == 2)
 	{
 		polarFile << _T("TWA\t");
 		for(int i = 0 ; i < 11; i++)
@@ -958,6 +960,25 @@ void Polar::save()
 			}
 			polarFile << _T("\n");
 		}
+	}
+	else
+	{
+	  wxString s = _T(",");	  
+	  for(int col = 0; col < dlg->m_gridEdit->GetCols(); col++)
+	      s <<  dlg->m_gridEdit->GetColLabelValue(col)+_T(",");
+	  s.RemoveLast();
+	  polarFile << s << _T("\n");
+	  
+	  for(int row = 0; row < dlg->m_gridEdit->GetRows(); row++)
+	  { 
+	    s = wxEmptyString;
+	    s <<  dlg->m_gridEdit->GetRowLabelValue(row) << _T(",");
+	    for(int col = 0; col < dlg->m_gridEdit->GetCols(); col++)
+	      s << dlg->m_gridEdit->GetCellValue(row,col) << _T(",");
+	    
+	    s.RemoveLast();
+	    polarFile << s << _T("\n");
+	  }
 	}
 	output.Close();
 
@@ -1002,12 +1023,10 @@ void Polar::loadPolar()
 	wxFileInputStream stream( fdlg.GetPath() );							
 	wxTextInputStream in(stream);	
 	wxString wdirstr,wsp;
-	int winddir = -1;
-	double speed = -1;
 
 	bool first = true;
 	int mode = -1, row = -1;
-	int ocpnCol = 0, ocpnRow = 0;
+	int ocpnCol = 0;
 	while(!stream.Eof())
 	{
 		wxString str = in.ReadLine();										// read line by line
@@ -1116,7 +1135,6 @@ void Polar::setSentence(wxString sentence)
 		{
 			if(m_NMEA0183.Parse())
 			{
-				double dWind = 0;
 				windAngle = m_NMEA0183.Mwv.WindAngle;
 				windReference = m_NMEA0183.Mwv.Reference;
 
@@ -1133,7 +1151,6 @@ void Polar::setSentence(wxString sentence)
 		{
 			if(m_NMEA0183.Parse())
 			{
-				double dWind = 0;
 				windAngle = m_NMEA0183.Vwr.WindDirectionMagnitude;
 				windReference = _T("R");
 
